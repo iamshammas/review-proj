@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>Advisor Dashboard</h2>
+        
+        <!-- Create New Review -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Create New Review Request</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label>Date</label>
+                            {{ form.date }}
+                        </div>
+                        <div class="col-md-3">
+                            <label>Intern</label>
+                            {{ form.intern }}
+                        </div>
+                        <div class="col-md-3">
+                            <label>Lesson</label>
+                            {{ form.lesson }}
+                        </div>
+                        <div class="col-md-3">
+                            <label>Preferred Reviewer</label>
+                            {{ form.preferred_reviewer }}
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Submit Review</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Date Filter -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Filter Reviews by Date</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <input type="date" name="date" class="form-control" value="{{ date_filter }}">
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Clear</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Reviews List -->
+        <div class="card">
+            <div class="card-header">
+                <h5>Your Reviews</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Intern</th>
+                            <th>Lesson</th>
+                            <th>Preferred Reviewer</th>
+                            <th>Assigned Reviewer</th>
+                            <th>Meet Link</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for review in reviews %}
+                        <tr>
+                            <td>{{ review.date }}</td>
+                            <td>{{ review.start_time|default:"-" }}</td>
+                            <td>{{ review.intern.name }}</td>
+                            <td>{{ review.lesson.name }}</td>
+                            <td>{{ review.preferred_reviewer.name|default:"-" }}</td>
+                            <td>{{ review.assigned_reviewer.name|default:"-" }}</td>
+                            <td>
+                                {% if review.google_meet_link %}
+                                <a href="{{ review.google_meet_link }}" target="_blank">Join</a>
+                                {% else %}-{% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if review.status == 'scheduled' %}success{% elif review.status == 'pending' %}warning{% elif review.status == 'completed' %}info{% else %}secondary{% endif %}">
+                                    {{ review.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center">No reviews found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

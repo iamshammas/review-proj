@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Coordinator Dashboard</h2>
+        
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Filters</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label>Date</label>
+                        <input type="date" name="date" class="form-control" value="{{ date_filter }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label>Advisor</label>
+                        <select name="advisor" class="form-control">
+                            <option value="">All Advisors</option>
+                            {% for advisor in advisors %}
+                            <option value="{{ advisor.id }}" {% if advisor_filter == advisor.id|stringformat:"i" %}selected{% endif %}>
+                                {{ advisor.user.first_name }} {{ advisor.user.last_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Reviewer</label>
+                        <select name="reviewer" class="form-control">
+                            <option value="">All Reviewers</option>
+                            {% for reviewer in reviewers %}
+                            <option value="{{ reviewer.id }}" {% if reviewer_filter == reviewer.id|stringformat:"i" %}selected{% endif %}>
+                                {{ reviewer.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Status</label>
+                        <select name="status" class="form-control">
+                            <option value="">All Status</option>
+                            <option value="pending" {% if status_filter == "pending" %}selected{% endif %}>Pending</option>
+                            <option value="scheduled" {% if status_filter == "scheduled" %}selected{% endif %}>Scheduled</option>
+                            <option value="completed" {% if status_filter == "completed" %}selected{% endif %}>Completed</option>
+                            <option value="cancelled" {% if status_filter == "cancelled" %}selected{% endif %}>Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Clear</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Copy Buttons -->
+        <div class="mb-3">
+            <button class="btn btn-success" onclick="copyToAdvisor()">Copy for Advisor</button>
+            <button class="btn btn-info" onclick="copyToReviewer()">Copy for Reviewer</button>
+        </div>
+        
+        <!-- Reviews Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5>Reviews</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll"></th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Intern</th>
+                            <th>Lesson</th>
+                            <th>Advisor</th>
+                            <th>Preferred Reviewer</th>
+                            <th>Assigned Reviewer</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for review in reviews %}
+                        <tr>
+                            <td><input type="checkbox" class="review-check" value="{{ review.id }}"></td>
+                            <td>{{ review.date }}</td>
+                            <td>{{ review.start_time|default:"-" }}</td>
+                            <td>{{ review.intern.name }}</td>
+                            <td>{{ review.lesson.name }}</td>
+                            <td>{{ review.intern.advisor.user.first_name }} {{ review.intern.advisor.user.last_name }}</td>
+                            <td>{{ review.preferred_reviewer.name|default:"-" }}</td>
+                            <td>{{ review.assigned_reviewer.name|default:"-" }}</td>
+                            <td>
+                                <span class="badge bg-{% if review.status == 'scheduled' %}success{% elif review.status == 'pending' %}warning{% elif review.status == 'completed' %}info{% else %}secondary{% endif %}">
+                                    {{ review.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'update_review' review.id %}" class="btn btn-sm btn-primary">Edit</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="10" class="text-center">No reviews found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Output Area -->
+        <div id="outputArea" class="mt-4" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Notification Text</h5>
+                </div>
+                <div class="card-body">
+                    <textarea id="notificationText" class="form-control" rows="10"></textarea>
+                    <button onclick="copyOutput()" class="btn btn-primary mt-2">Copy to Clipboard</button>
+                    <button onclick="hideOutput()" class="btn btn-secondary mt-2">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Select/Deselect all checkboxes
+document.getElementById('selectAll').addEventListener('click', function() {
+    const checkboxes = document.querySelectorAll('.review-check');
+    checkboxes.forEach(cb => cb.checked = this.checked);
+});
+
+// Get selected review IDs
+function getSelectedReviews() {
+    const checkboxes = document.querySelectorAll('.review-check:checked');
+    return Array.from(checkboxes).map(cb => cb.value);
+}
+
+// Copy for Advisor
+function copyToAdvisor() {
+    const reviews = getSelectedReviews();
+    if (reviews.length === 0) {
+        alert('Please select at least one review');
+        return;
+    }
+    
+    fetch(`/api/generate-notification/?target=advisor&review_ids[]=${reviews.join('&review_ids[]=')}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('notificationText').value = data.text;
+            document.getElementById('outputArea').style.display = 'block';
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+}
+
+// Copy for Reviewer
+function copyToReviewer() {
+    const reviews = getSelectedReviews();
+    if (reviews.length === 0) {
+        alert('Please select at least one review');
+        return;
+    }
+    
+    fetch(`/api/generate-notification/?target=reviewer&review_ids[]=${reviews.join('&review_ids[]=')}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('notificationText').value = data.text;
+            document.getElementById('outputArea').style.display = 'block';
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+}
+
+function copyOutput() {
+    const textarea = document.getElementById('notificationText');
+    textarea.select();
+    document.execCommand('copy');
+    alert('Copied to clipboard!');
+}
+
+function hideOutput() {
+    document.getElementById('outputArea').style.display = 'none';
+}
+</script>
+{% endblock %}
