@@ -11,27 +11,14 @@ class Advisor(models.Model):
         return f"{self.user.first_name} {self.user.last_name}"
 
 @receiver(post_save, sender=User)
-def create_or_update_user_profile(sender, instance, created, **kwargs):
-    if created:
+def create_user_profile(sender, instance, created, **kwargs):
+    # Create Advisor profile only for regular users, not staff/superusers
+    if created and not instance.is_staff:
         Advisor.objects.create(user=instance)
-    instance.advisor.save()
 
 class Reviewer(models.Model):
     name = models.CharField(max_length=100)
     stack = models.CharField(max_length=100, blank=True)
-    
-    def __str__(self):
-        return self.name
-
-class Intern(models.Model):
-    name = models.CharField(max_length=100)
-    advisor = models.ForeignKey(Advisor, on_delete=models.CASCADE, related_name='interns')
-    
-    def __str__(self):
-        return self.name
-
-class Lesson(models.Model):
-    name = models.CharField(max_length=200)
     
     def __str__(self):
         return self.name
@@ -47,8 +34,8 @@ class Review(models.Model):
     date = models.DateField()
     start_time = models.TimeField(null=True, blank=True)
     google_meet_link = models.URLField(blank=True)
-    intern = models.ForeignKey(Intern, on_delete=models.CASCADE)
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    intern_name = models.CharField(max_length=100)
+    lesson_name = models.CharField(max_length=200)
     preferred_reviewer = models.ForeignKey(Reviewer, on_delete=models.SET_NULL, 
                                          null=True, blank=True, related_name='preferred_reviews')
     assigned_reviewer = models.ForeignKey(Reviewer, on_delete=models.SET_NULL, 
@@ -58,7 +45,7 @@ class Review(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.intern.name} - {self.lesson.name} - {self.date}"
+        return f"{self.intern_name} - {self.lesson_name} - {self.date}"
     
     class Meta:
         ordering = ['date', 'start_time']

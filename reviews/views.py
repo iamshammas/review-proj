@@ -4,8 +4,13 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
 from django.http import JsonResponse
 from .models import Review, Advisor, Reviewer
-from .forms import ReviewForm, ReviewUpdateForm
+from django.contrib.auth import logout
+from .forms import AdvisorReviewForm, ReviewUpdateForm
 import datetime
+
+def user_logout(request):
+    logout(request)
+    return redirect('dashboard')
 
 @login_required
 def dashboard(request):
@@ -13,6 +18,7 @@ def dashboard(request):
         return coordinator_dashboard(request)
     else:
         return advisor_dashboard(request)
+    
 
 @login_required
 @staff_member_required
@@ -30,7 +36,7 @@ def coordinator_dashboard(request):
     if date_filter:
         reviews = reviews.filter(date=date_filter)
     if advisor_filter:
-        reviews = reviews.filter(intern__advisor_id=advisor_filter)
+        reviews = reviews.filter(created_by_id=advisor_filter)  # Changed this line
     if reviewer_filter:
         reviews = reviews.filter(assigned_reviewer_id=reviewer_filter)
     if status_filter:
@@ -49,22 +55,22 @@ def coordinator_dashboard(request):
 
 @login_required
 def advisor_dashboard(request):
-    advisor = request.user.advisor
     date_filter = request.GET.get('date', '')
     
-    reviews = Review.objects.filter(intern__advisor=advisor)
+    # Get only reviews created by this advisor
+    reviews = Review.objects.filter(created_by=request.user)
     if date_filter:
         reviews = reviews.filter(date=date_filter)
     
     if request.method == 'POST':
-        form = ReviewForm(request.POST, user=request.user)
+        form = AdvisorReviewForm(request.POST)
         if form.is_valid():
             review = form.save(commit=False)
             review.created_by = request.user
             review.save()
             return redirect('dashboard')
     else:
-        form = ReviewForm(user=request.user)
+        form = AdvisorReviewForm()
     
     return render(request, 'advisor/dashboard.html', {
         'reviews': reviews,
@@ -118,17 +124,17 @@ def generate_notification(request):
         return JsonResponse({'error': 'No reviews selected'}, status=400)
     
     date = reviews[0].date
-    text = f"Reviews on {date}\n\n"
-    
+    text = f"Reviews on {date}\n"
+    text += f'-------------------------\n'
     for review in reviews:
         if target == 'advisor':
-            text += f"Intern: {review.intern.name}\n"
+            text += f"Intern: {review.intern_name}\n"
             text += f"Reviewer: {review.assigned_reviewer.name if review.assigned_reviewer else 'Not assigned'}\n"
         elif target == 'reviewer':
-            text += f"Intern: {review.intern.name}\n"
-            text += f"Lesson: {review.lesson.name}\n"
-        
+            text += f"Intern: {review.intern_name}\n"
+            text += f"Week: {review.lesson_name}\n"
         text += f"Google Meet: {review.google_meet_link if review.google_meet_link else 'Link not set'}\n"
-        text += f"Time: {review.start_time.strftime('%I:%M %p') if review.start_time else 'Time not set'}\n\n"
+        text += f"Time: {review.start_time.strftime('%I:%M %p') if review.start_time else 'Time not set'}\n"
+        text += f'-------------------------\n'
     
     return JsonResponse({'text': text})

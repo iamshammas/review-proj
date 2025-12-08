@@ -8,9 +8,9 @@
                 <h4>Update Review</h4>
             </div>
             <div class="card-body">
-                <p><strong>Intern:</strong> {{ review.intern.name }}</p>
-                <p><strong>Lesson:</strong> {{ review.lesson.name }}</p>
-                <p><strong>Advisor:</strong> {{ review.intern.advisor.user.first_name }} {{ review.intern.advisor.user.last_name }}</p>
+                <p><strong>Intern:</strong> {{ review.intern_name }}</p>
+                <p><strong>Lesson:</strong> {{ review.lesson_name }}</p>
+                <p><strong>Advisor:</strong> {{ review.created_by.first_name }} {{ review.created_by.last_name }}</p>
                 <p><strong>Preferred Reviewer:</strong> {{ review.preferred_reviewer.name|default:"None" }}</p>
                 
                 <form method="post">

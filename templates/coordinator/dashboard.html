@@ -53,6 +53,7 @@
                         <a href="{% url 'dashboard' %}" class="btn btn-secondary">Clear</a>
                     </div>
                 </form>
+                
             </div>
         </div>
         
@@ -89,9 +90,9 @@
                             <td><input type="checkbox" class="review-check" value="{{ review.id }}"></td>
                             <td>{{ review.date }}</td>
                             <td>{{ review.start_time|default:"-" }}</td>
-                            <td>{{ review.intern.name }}</td>
-                            <td>{{ review.lesson.name }}</td>
-                            <td>{{ review.intern.advisor.user.first_name }} {{ review.intern.advisor.user.last_name }}</td>
+                            <td>{{ review.intern_name }}</td>
+                            <td>{{ review.lesson_name }}</td>
+                            <td>{{ review.created_by.first_name }} {{ review.created_by.last_name }}</td>
                             <td>{{ review.preferred_reviewer.name|default:"-" }}</td>
                             <td>{{ review.assigned_reviewer.name|default:"-" }}</td>
                             <td>

@@ -1,19 +1,15 @@
 from django import forms
-from .models import Review, Intern, Lesson
+from .models import Review
 
-class ReviewForm(forms.ModelForm):
+class AdvisorReviewForm(forms.ModelForm):
     class Meta:
         model = Review
-        fields = ['date', 'intern', 'lesson', 'preferred_reviewer']
+        fields = ['date', 'intern_name', 'lesson_name', 'preferred_reviewer']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
+            'intern_name': forms.TextInput(attrs={'placeholder': 'Enter intern name'}),
+            'lesson_name': forms.TextInput(attrs={'placeholder': 'Enter lesson name'}),
         }
-    
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
-        super().__init__(*args, **kwargs)
-        if user and hasattr(user, 'advisor'):
-            self.fields['intern'].queryset = Intern.objects.filter(advisor=user.advisor)
 
 class ReviewUpdateForm(forms.ModelForm):
     class Meta:
@@ -22,4 +18,5 @@ class ReviewUpdateForm(forms.ModelForm):
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
             'start_time': forms.TimeInput(attrs={'type': 'time'}),
-        } 
+            'google_meet_link': forms.TextInput(attrs={'placeholder': 'https://meet.google.com/...'}),
+        }
