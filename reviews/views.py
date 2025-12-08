@@ -1,12 +1,29 @@
+from pyexpat.errors import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
+from django.contrib.auth import login,authenticate
+from django.contrib.auth.models import User
 from .models import Review, Advisor, Reviewer
 from django.contrib.auth import logout
 from .forms import AdvisorReviewForm, ReviewUpdateForm
 import datetime
+
+def register(request):
+    if request.method == 'POST':
+        # Get form data
+        name = request.POST.get('name')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = User.objects.create_user(first_name=name,username=username,password=password)
+        if user is not None:
+            # Advisor.objects.create(user=name)
+            user.save()
+            return redirect('login')
+    # return render(request, 'register.html')
+    return render(request,'registration/register.html')
 
 def user_logout(request):
     logout(request)
@@ -138,3 +155,20 @@ def generate_notification(request):
         text += f'-------------------------\n'
     
     return JsonResponse({'text': text})
+
+
+
+
+
+def add_reviewer(request):
+    count = Reviewer.objects.count()
+    context = {
+        'count':count
+    }
+    if request.method == 'POST':
+        reviewer = request.POST.get('reviewerName')
+        stack = request.POST.get('stack')
+        us = Reviewer.objects.create(name=reviewer,stack=stack)
+        return redirect('dashboard')
+    return render(request,'coordinator/add_reviewer.html',context)
+    # return HttpResponse('worked')

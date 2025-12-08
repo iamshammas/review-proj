@@ -26,13 +26,15 @@
             <a class="navbar-brand" href="{% url 'dashboard' %}">Review System</a>
             <div class="navbar-nav ms-auto ">
                 {% if user.is_authenticated %}
-                    <span class="nav-item nav-link">Hello, {{ user.first_name|default:user.username }}</span>
+                    <span class="nav-item nav-link">Hello, <b>{{ user.first_name|default:user.username }}</b></span>
                     {% if user.is_staff %}
                         <a class="nav-link" href="{% url 'reporting' %}">Reporting</a>
+                        <a class="nav-link" href="{% url 'add_reviewer' %}">Add reviewer</a>
                     {% endif %}
                     <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                 {% else %}
                     <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    <a class="nav-link" href="{% url 'register' %}">Register</a>
                 {% endif %}
             </div>
         </div>

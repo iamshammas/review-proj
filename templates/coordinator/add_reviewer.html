@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Coordinator Dashboard</h2>
+        <p class="text-muted">Submit stack review information for developer assessment</p>
+    </div>
+</div>
+
+<!-- Stats Section with Number of Reviewers -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="d-flex align-items-center justify-content-center mb-3">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                        <i class="fas fa-users text-primary fs-4"></i>
+                    </div>
+                </div>
+                <h4 class="card-title mb-1" id="reviewersCount">{{count}}</h4>
+                <p class="card-text text-muted small">Total Reviewers</p>
+                <div class="progress" style="height: 6px;">
+                    <div class="progress-bar bg-primary" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="d-flex align-items-center justify-content-center mb-3">
+                    <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                        <i class="fas fa-check-circle text-success fs-4"></i>
+                    </div>
+                </div>
+                <h4 class="card-title mb-1" id="completedReviews">0</h4>
+                <p class="card-text text-muted small">Completed Reviews</p>
+                <div class="progress" style="height: 6px;">
+                    <div class="progress-bar bg-success" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="d-flex align-items-center justify-content-center mb-3">
+                    <div class="bg-warning bg-opacity-10 p-3 rounded-circle">
+                        <i class="fas fa-layer-group text-warning fs-4"></i>
+                    </div>
+                </div>
+                <h4 class="card-title mb-1" id="stacksCount">9</h4>
+                <p class="card-text text-muted small">Available Stacks</p>
+                <div class="progress" style="height: 6px;">
+                    <div class="progress-bar bg-warning" style="width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="d-flex align-items-center justify-content-center mb-3">
+                    <div class="bg-info bg-opacity-10 p-3 rounded-circle">
+                        <i class="fas fa-chart-line text-info fs-4"></i>
+                    </div>
+                </div>
+                <h4 class="card-title mb-1" id="todayReviews">0</h4>
+                <p class="card-text text-muted small">Today's Reviews</p>
+                <div class="progress" style="height: 6px;">
+                    <div class="progress-bar bg-info" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form Section -->
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow border-0">
+            <div class="card-body p-0">
+                <div class="row g-0">
+                    <!-- Form Information Section -->
+                    <div class="col-md-5 bg-primary text-white p-4">
+                        <h3 class="card-title text-white mb-4">
+                            <i class="fas fa-info-circle me-2"></i>Form Information
+                        </h3>
+                        <p class="mb-4">This form collects information about the technology stack being reviewed and the reviewer's name.</p>
+                        
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-3">
+                                <i class="fas fa-check-circle text-warning me-2"></i>
+                                <strong>Stack Options:</strong> Select from 9 available technology stacks
+                            </li>
+                            <li class="mb-3">
+                                <i class="fas fa-check-circle text-warning me-2"></i>
+                                <strong>Reviewer Name:</strong> Enter your full name
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle text-warning me-2"></i>
+                                <strong>Quick Process:</strong> Takes less than a minute
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Form Content Section -->
+                    <div class="col-md-7 p-4">
+                        <form id="stackReviewForm" method="post" action="">
+                            {% csrf_token %}
+                            
+                            <!-- Stack Selection Dropdown -->
+                            <div class="mb-4">
+                                <label for="stack" class="form-label fw-bold">
+                                    Technology Stack <span class="text-danger">*</span>
+                                </label>
+                                <p class="text-muted small mb-2">Select a technology stack:</p>
+                                
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-layer-group"></i>
+                                    </span>
+                                    <select id="stack" name="stack" class="form-select" required>
+                                        <option value="" disabled selected>Select a technology stack...</option>
+                                        <option value="MERN">MERN</option>
+                                        <option value="MEAN">MEAN</option>
+                                        <option value="FLUTTER">Flutter</option>
+                                        <option value="PYTHON">Python</option>
+                                        <option value="DOTNET">.NET</option>
+                                        <option value="GOLANG">GoLang</option>
+                                        <option value="DS">Data Science (DS)</option>
+                                        <option value="DA">Data Analytics (DA)</option>
+                                        <option value="JAVA">Java</option>
+                                    </select>
+                                    <button type="button" class="btn btn-outline-secondary" id="clearStackBtn" title="Clear selection">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                
+                                <div id="stackError" class="invalid-feedback d-none">
+                                    Please select a technology stack
+                                </div>
+                            </div>
+                            
+                            <!-- Reviewer Name -->
+                            <div class="mb-4">
+                                <label for="reviewerName" class="form-label fw-bold">
+                                    Reviewer Name <span class="text-danger">*</span>
+                                </label>
+                                <p class="text-muted small mb-2">Enter the full name of the reviewer</p>
+                                
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                    <input type="text" id="reviewerName" name="reviewerName" 
+                                           class="form-control" placeholder="Enter reviewer's full name" required>
+                                    <button type="button" class="btn btn-outline-secondary" id="clearNameBtn" title="Clear field">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div id="nameError" class="invalid-feedback d-none">
+                                    Please enter a valid name (minimum 2 characters)
+                                </div>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="button" class="btn btn-outline-secondary me-md-2" id="resetFormBtn">
+                                    <i class="fas fa-redo me-1"></i> Reset Form
+                                </button>
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="fas fa-paper-plane me-2"></i> Submit Review
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer note -->
+        <div class="text-center text-muted mt-4 small">
+            <p>Coordinator Dashboard &copy; 2023 | Stack Review System</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom styles for the stack review form */
+    .bg-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+    }
+    
+    select.form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    /* Stats card styling */
+    .card {
+        transition: transform 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .bg-opacity-10 {
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
+    }
+    
+    /* Progress bar styling */
+    .progress {
+        border-radius: 10px;
+    }
+    
+    /* Stats section specific */
+    .rounded-circle {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get DOM elements
+        const form = document.getElementById('stackReviewForm');
+        const stackSelect = document.getElementById('stack');
+        const reviewerNameInput = document.getElementById('reviewerName');
+        const stackError = document.getElementById('stackError');
+        const nameError = document.getElementById('nameError');
+        
+        // Button elements
+        const clearStackBtn = document.getElementById('clearStackBtn');
+        const clearNameBtn = document.getElementById('clearNameBtn');
+        const resetFormBtn = document.getElementById('resetFormBtn');
+        
+        // Clear stack selection
+        clearStackBtn.addEventListener('click', function() {
+            stackSelect.value = '';
+            stackSelect.focus();
+        });
+        
+        // Clear name field
+        clearNameBtn.addEventListener('click', function() {
+            reviewerNameInput.value = '';
+            reviewerNameInput.focus();
+        });
+        
+        // Reset entire form
+        resetFormBtn.addEventListener('click', function() {
+            form.reset();
+            stackError.classList.add('d-none');
+            nameError.classList.add('d-none');
+            stackSelect.classList.remove('is-invalid');
+            reviewerNameInput.classList.remove('is-invalid');
+        });
+        
+        // Form validation before submission
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            // Validate stack selection
+            if (!stackSelect.value) {
+                stackError.classList.remove('d-none');
+                stackSelect.classList.add('is-invalid');
+                isValid = false;
+                e.preventDefault(); // Only prevent if invalid
+            } else {
+                stackError.classList.add('d-none');
+                stackSelect.classList.remove('is-invalid');
+            }
+            
+            // Validate reviewer name
+            if (!reviewerNameInput.value.trim() || reviewerNameInput.value.trim().length < 2) {
+                nameError.classList.remove('d-none');
+                reviewerNameInput.classList.add('is-invalid');
+                isValid = false;
+                e.preventDefault(); // Only prevent if invalid
+            } else {
+                nameError.classList.add('d-none');
+                reviewerNameInput.classList.remove('is-invalid');
+            }
+            
+            // If form is valid, allow submission to Django
+            if (isValid) {
+                // Form will submit normally to Django
+                // Django will handle the data processing and redirect
+                console.log('Form is valid, submitting to Django...');
+            }
+        });
+        
+        // Real-time validation for name input
+        reviewerNameInput.addEventListener('input', function() {
+            if (this.value.trim().length >= 2) {
+                nameError.classList.add('d-none');
+                this.classList.remove('is-invalid');
+            }
+        });
+        
+        // Populate sample data for demonstration
+        const sampleNames = ['Justin Ram', 'Rashid', 'Rabeeh Ibrahim'];
+        reviewerNameInput.placeholder = `e.g. ${sampleNames[Math.floor(Math.random() * sampleNames.length)]}`;
+    });
+</script>
+{% endblock %}

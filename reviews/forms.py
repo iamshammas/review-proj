@@ -8,7 +8,7 @@ class AdvisorReviewForm(forms.ModelForm):
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
             'intern_name': forms.TextInput(attrs={'placeholder': 'Enter intern name'}),
-            'lesson_name': forms.TextInput(attrs={'placeholder': 'Enter lesson name'}),
+            'lesson_name': forms.TextInput(attrs={'placeholder': 'Eg: React W1'}),
         }
 
 class ReviewUpdateForm(forms.ModelForm):
