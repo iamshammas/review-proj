@@ -33,7 +33,7 @@
                             <option value="">All Reviewers</option>
                             {% for reviewer in reviewers %}
                             <option value="{{ reviewer.id }}" {% if reviewer_filter == reviewer.id|stringformat:"i" %}selected{% endif %}>
-                                {{ reviewer.name }}
+                                {{ reviewer.name }} - {{ reviewer.stack}}
                             </option>
                             {% endfor %}
                         </select>
