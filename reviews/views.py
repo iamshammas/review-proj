@@ -172,3 +172,12 @@ def add_reviewer(request):
         return redirect('dashboard')
     return render(request,'coordinator/add_reviewer.html',context)
     # return HttpResponse('worked')
+
+
+
+def remarks(request,review_id):
+    review = get_object_or_404(Review, id=review_id)
+    data = {
+        'review':review
+    }
+    return render(request,'coordinator/remarks.html',data)

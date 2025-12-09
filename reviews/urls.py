@@ -12,4 +12,5 @@ urlpatterns = [
     path('reporting/', views.reporting, name='reporting'),
     path('api/generate-notification/', views.generate_notification, name='generate_notification'),
     path('add_reviewer/',views.add_reviewer,name='add_reviewer'),
+    path('remarks/<int:review_id>/',views.remarks,name='remarks'),
 ]

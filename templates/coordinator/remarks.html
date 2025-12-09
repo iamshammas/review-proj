@@ -1,0 +1,77 @@
+<!-- simple_remarks.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Review Remarks</h4>
+                        <a href="{% url 'dashboard' %}" class="btn btn-light btn-sm">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Intern Name:</h6>
+                            <h5>{{ review.intern_name }}</h5>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Review Date:</h6>
+                            <h5>{{ review.date }}</h5>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Current Week:</h6>
+                            <h5>{{ review.lesson_name }}</h5>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Status</h6>
+                            <span class="badge bg-{% if review.status == 'completed' %}success{% elif review.status == 'pending' %}warning{% elif review.status == 'scheduled' %}info{% else %}secondary{% endif %}">
+                                {{ review.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="text-muted">Remarks</h6>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                {% if review.remarks %}
+                                    <p class="mb-0">{{ review.remarks|linebreaks }}</p>
+                                {% else %}
+                                    <p class="text-muted text-center mb-0">
+                                        <i class="bi bi-chat-left-text me-2"></i>
+                                        No remarks provided
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Dashboard
+                        </a>
+                        <!-- <a href=" url 'update_review' review.id " class="btn btn-primary">
+                            <i class="bi bi-pencil"></i> Edit Review
+                        </a> -->
+                    </div>
+                </div>
+                <!-- <div class="card-footer text-muted">
+                    <small>
+                        Created by  review.created_by.get_full_name|default:review.created_by.username
+                        on  review.created_at|date:"F d, Y H:i" 
+                    </small>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
