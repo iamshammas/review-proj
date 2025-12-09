@@ -97,10 +97,10 @@
                             <td>{{ review.created_by.first_name }} {{ review.created_by.last_name }}</td>
                             <td>{{ review.preferred_reviewer.name|default:"-" }}</td>
                             <td>{{ review.assigned_reviewer.name|default:"-" }}</td>
-                            {% if review.remarks == None %}
-                            <td>No</td>
-                            {% else %}
+                            {% if review.remarks !== None %}
                             <td><a class="nav-link" href="{% url 'remarks' review.id %}">Yes</a></td>
+                            {% else %}
+                            <td>No</td>
                             {% endif %}
                             <td>
                                 <span class="badge bg-{% if review.status == 'scheduled' %}success{% elif review.status == 'pending' %}warning{% elif review.status == 'completed' %}info{% else %}secondary{% endif %}">
