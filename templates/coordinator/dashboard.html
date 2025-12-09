@@ -97,7 +97,7 @@
                             <td>{{ review.created_by.first_name }} {{ review.created_by.last_name }}</td>
                             <td>{{ review.preferred_reviewer.name|default:"-" }}</td>
                             <td>{{ review.assigned_reviewer.name|default:"-" }}</td>
-                            {% if review.remarks !== None %}
+                            {% if review.remarks != None %}
                             <td><a class="nav-link" href="{% url 'remarks' review.id %}">Yes</a></td>
                             {% else %}
                             <td>No</td>
