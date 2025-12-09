@@ -11,31 +11,36 @@
                 <h5>Create New Review Request</h5>
             </div>
             <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <label>Date</label>
-                            {{ form.date }}
-                        </div>
-                        <div class="col-md-3">
-                            <label>Intern Name</label>
-                            {{ form.intern_name }}
-                        </div>
-                        <div class="col-md-3">
-                            <label>Current Week</label>
-                            {{ form.lesson_name }}
-                        </div>
-                        <div class="col-md-3">
-                            <label>Preferred Reviewer</label>
-                            {{ form.preferred_reviewer }} 
-                        </div>
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Submit Review</button>
-                        </div>
-                    </div>
-                </form>
+    <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label>Date</label>
+                {{ form.date }}
             </div>
+            <div class="col-md-3">
+                <label>Intern Name</label>
+                {{ form.intern_name }}
+            </div>
+            <div class="col-md-3">
+                <label>Current Week</label>
+                {{ form.lesson_name }}
+            </div>
+            <div class="col-md-3">
+                <label>Preferred Reviewer</label>
+                {{ form.preferred_reviewer }} 
+            </div>
+            <div class="col-12">
+                <label>Remarks</label>
+                {{ form.remarks }}
+                <small class="form-text text-muted">Add any additional notes or comments about this review</small>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Submit Review</button>
+            </div>
+        </div>
+    </form>
+</div>
         </div>
         
         <!-- Date Filter -->

@@ -43,6 +43,7 @@ class Review(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    remarks = models.TextField(blank=True, null=True, help_text="Additional comments or notes about the review")
     
     def __str__(self):
         return f"{self.intern_name} - {self.lesson_name} - {self.date}"
