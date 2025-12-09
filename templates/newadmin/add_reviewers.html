@@ -1,0 +1,153 @@
+<!-- templates/add_reviewers.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Reviewers in Bulk</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        textarea {
+            height: 150px;
+            resize: vertical;
+        }
+        .help-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+        .reviewer-count {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add Reviewers in Bulk</h1>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="stack">Stack:</label>
+                <select id="stack" name="stack" required>
+                    <option value="">Select a stack</option>
+                    <option value="FLUTTER" {% if stack == 'FLUTTER' %}selected{% endif %}>FLUTTER</option>
+                    <option value="MERN" {% if stack == 'MERN' %}selected{% endif %}>MERN</option>
+                    <option value="DA/DS" {% if stack == 'DA/DS' %}selected{% endif %}>DA/DS</option>
+                    <option value="JAVA" {% if stack == 'JAVA' %}selected{% endif %}>JAVA</option>
+                    <option value="PYTHON" {% if stack == 'PYTHON' %}selected{% endif %}>PYTHON</option>
+                    <option value="MEAN" {% if stack == 'MEAN' %}selected{% endif %}>MEAN</option>
+                    <option value="DOTNET" {% if stack == 'DOTNET' %}selected{% endif %}>DOTNET</option>
+                    <option value="GOLANG" {% if stack == 'GOLANG' %}selected{% endif %}>GOLANG</option>
+                </select>
+                <div class="help-text">Select the technology stack for all reviewers</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="names">Reviewer Names:</label>
+                <textarea 
+                    id="names" 
+                    name="names" 
+                    placeholder="Enter names, one per line or separated by commas"
+                    required>{{ names|default:'' }}</textarea>
+                <div class="help-text">
+                    Enter one name per line or separate by commas.<br>
+                    Example: <br>
+                    John Doe<br>
+                    Jane Smith<br>
+                    Bob Johnson
+                </div>
+            </div>
+            
+            <button type="submit">Add Reviewers</button>
+        </form>
+        
+        {% if added_count %}
+            <div class="reviewer-count">
+                Successfully added {{ added_count }} reviewer(s)!
+            </div>
+        {% endif %}
+        
+        <div style="margin-top: 40px;">
+            <h3>Recent Reviewers</h3>
+            <table border="1" cellpadding="10" cellspacing="0" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Stack</th>
+                        <th>Added On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reviewer in recent_reviewers %}
+                    <tr>
+                        <td>{{ reviewer.name }}</td>
+                        <td>{{ reviewer.stack }}</td>
+                        <td>{{ reviewer.created_at|date:"Y-m-d H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center;">No reviewers yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

@@ -8,5 +8,7 @@ urlpatterns = [
     path('', include('reviews.urls')),
     path('accounts/', RedirectView.as_view(url='/', permanent=True)),
     path('newadmin/',include('newadmin.urls')),
-    path('addlist/',views.addlist,name='addlist')
+    path('addlist/',views.addlist,name='add_reviewers'),
+    #  path('add-reviewers/', views.add_reviewers_view, name='add_reviewers'),
+    path('api/add-reviewers/', views.bulk_add_reviewers_api, name='bulk_add_reviewers_api'),
 ]
