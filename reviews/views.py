@@ -169,7 +169,9 @@ def add_reviewer(request):
         reviewer = request.POST.get('reviewerName')
         stack = request.POST.get('stack')
         us = Reviewer.objects.create(name=reviewer,stack=stack)
-        return redirect('dashboard')
+        if us is not None:
+            us.save()
+            return redirect('dashboard')
     return render(request,'coordinator/add_reviewer.html',context)
     # return HttpResponse('worked')
 

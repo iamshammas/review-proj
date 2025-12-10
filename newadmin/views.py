@@ -11,7 +11,9 @@ def register(request):
         uname = request.POST.get('username')
         pswd = request.POST.get('pswd')
         user = User.objects.create_superuser(username=uname,password=pswd)
-        return redirect('reg')
+        if user is not None:
+            user.save()
+            return redirect('reg')
     return render(request,'newadmin/register.html')
 
 # data = [
