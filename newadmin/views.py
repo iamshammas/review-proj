@@ -4,6 +4,7 @@ from reviews.models import Reviewer
 from django.contrib import messages
 from django.http import HttpResponse
 import re
+from reviews.models import Advisor
 # Create your views here.
 
 def register(request):
@@ -193,3 +194,35 @@ def bulk_add_reviewers_api(request):
         content_type='application/json',
         status=405
     )
+
+
+
+# def advisor_list(request):
+    # return render(request,'newadmin/advisors.html')
+
+
+# views.py
+def advisor_list(request):
+    # Example names list - replace with your actual data
+    # names = [
+    #     "John Smith",
+    #     "Emma Johnson",
+    #     "Michael Brown",
+    #     "Sarah Davis",
+    #     "Robert Wilson",
+    #     "Lisa Anderson",
+    #     "David Thompson",
+    #     "Maria Garcia"
+    # ]
+    
+    # If you want to pass names with custom counts
+    names = [
+        {"name": "John Smith", "count": 5},
+        {"name": "Emma Johnson", "count": 3},
+    ]
+    list = Advisor.objects.all()
+    return render(request, 'newadmin/advisors.html', {
+        # 'names': names,
+        'names': names,  # alternative
+        'list':list
+    })

@@ -1,116 +1,421 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <h2>Advisor Dashboard</h2>
-        
-        <!-- Create New Review -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>Create New Review Request</h5>
-            </div>
-            <div class="card-body">
-    <form method="post">
-        {% csrf_token %}
-        <div class="row g-3">
-            <div class="col-md-3">
-                <label>Date</label>
-                {{ form.date }}
-            </div>
-            <div class="col-md-3">
-                <label>Intern Name</label>
-                {{ form.intern_name }}
-            </div>
-            <div class="col-md-3">
-                <label>Current Week</label>
-                {{ form.lesson_name }}
-            </div>
-            <div class="col-md-3">
-                <label>Preferred Reviewer</label>
-                {{ form.preferred_reviewer }} 
-            </div>
-            <div class="col-12">
-                <label>Remarks</label>
-                {{ form.remarks }}
-                <small class="form-text text-muted">Add any additional notes or comments about this review</small>
-            </div>
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">Submit Review</button>
-            </div>
-        </div>
-    </form>
-</div>
-        </div>
-        
-        <!-- Date Filter -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>Filter Reviews by Date</h5>
-            </div>
-            <div class="card-body">
-                <form method="get" class="row g-3">
-                    <div class="col-md-3">
-                        <input type="date" name="date" class="form-control" value="{{ date_filter }}">
-                    </div>
-                    <div class="col-md-3">
-                        <button type="submit" class="btn btn-primary">Filter</button>
-                        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Clear</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-        
-        <!-- Reviews List -->
-        <div class="card">
-            <div class="card-header">
-                <h5>Your Reviews</h5>
-            </div>
-            <div class="card-body">
-                <table class="table table-hover">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Intern</th>
-            <th>Current week</th>
-            <th>Preferred Reviewer</th>
-            <th>Assigned Reviewer</th>
-            <th>Meet Link</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for review in reviews %}
-        <tr>
-             <td>{{ review.date }}</td>
-            <td>{{ review.start_time|default:"-" }}</td>
-            <td>{{ review.intern_name }}</td>
-            <td>{{ review.lesson_name }}</td>
-            <td>{{ review.preferred_reviewer.name|default:"-" }}</td>
-            <td>{{ review.assigned_reviewer.name|default:"-" }}</td>
-            <td>
-                {% if review.google_meet_link %}
-                <a href="{{ review.google_meet_link }}" target="_blank">Join</a>
-                {% else %}-{% endif %}
-            </td>
-            <td>
-                <span class="badge bg-{% if review.status == 'scheduled' %}success{% elif review.status == 'pending' %}warning{% elif review.status == 'completed' %}info{% else %}secondary{% endif %}">
-                    {{ review.get_status_display }}
-                </span>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="8" class="text-center">No reviews found</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-
-            </div>
+<div class="container-fluid px-0 px-md-3">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h4 mb-0 text-black">Advisor Dashboard</h2>
+        <div class="d-none d-md-block">
+            <span class="badge bg-secondary">
+                {{ reviews|length }} review{{ reviews|length|pluralize }}
+            </span>
         </div>
     </div>
+
+    <!-- Create New Review Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header py-3">
+            <h5 class="mb-0">
+                <i class="bi bi-plus-circle me-2"></i>Create New Review Request
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="row g-3">
+                    <!-- Date Field -->
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label class="form-label fw-semibold mb-1">Date *</label>
+                        {{ form.date }}
+                        <!-- <small class="form-text d-block mt-1">Select review date</small> -->
+                    </div>
+                    
+                    <!-- Intern Name Field -->
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label class="form-label fw-semibold mb-1">Intern Name *</label>
+                        {{ form.intern_name }}
+                        <!-- <small class="form-text d-block mt-1">Full name of intern</small> -->
+                    </div>
+                    
+                    <!-- Current Week Field -->
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label class="form-label fw-semibold mb-1">Current Week *</label>
+                        {{ form.lesson_name }}
+                        <!-- <small class="form-text d-block mt-1">Week/Lesson number</small> -->
+                    </div>
+                    
+                    <!-- Preferred Reviewer Field -->
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <label class="form-label fw-semibold mb-1">Preferred Reviewer *</label>
+                        {{ form.preferred_reviewer }}
+                        <!-- <small class="form-text d-block mt-1">Optional preferred reviewer</small> -->
+                    </div>
+                    
+                    <!-- Remarks Field -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold mb-1">Remarks</label>
+                        {{ form.remarks }}
+                        <!-- <small class="form-text">Add any additional notes or comments about this review</small> -->
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="col-12">
+                        <div class="d-grid d-md-block">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-send me-2"></i>Submit Review Request
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Date Filter Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header py-3">
+            <h5 class="mb-0">
+                <i class="bi bi-filter me-2"></i>Filter Reviews
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    <label class="form-label mb-1">Filter by Date</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-calendar"></i>
+                        </span>
+                        <input type="date" name="date" class="form-control" value="{{ date_filter }}">
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-8 col-lg-9">
+                    <div class="d-flex flex-wrap gap-2 mt-2">
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="bi bi-funnel me-2"></i>Apply Filter
+                        </button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-2"></i>Clear Filter
+                        </a>
+                        {% if date_filter %}
+                        <span class="ms-auto align-self-center text-muted d-none d-lg-block">
+                            Showing reviews for {{ date_filter }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reviews List Card -->
+    <div class="card shadow-sm">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="bi bi-list-task me-2"></i>Your Reviews
+            </h5>
+            <span class="badge bg-primary rounded-pill d-md-none">
+                {{ reviews|length }}
+            </span>
+        </div>
+        <div class="card-body p-0">
+            <!-- Desktop Table View -->
+            <div class="table-responsive d-none d-md-block">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="py-3 ps-3">Date</th>
+                            <th class="py-3">Time</th>
+                            <th class="py-3">Intern</th>
+                            <th class="py-3">Week</th>
+                            <th class="py-3">Preferred</th>
+                            <th class="py-3">Assigned</th>
+                            <th class="py-3">Link</th>
+                            <th class="py-3 pe-3">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for review in reviews %}
+                        <tr>
+                            <!-- Date -->
+                            <td class="ps-3">
+                                <div class="fw-semibold">{{ review.date }}</div>
+                            </td>
+                            
+                            <!-- Time -->
+                            <td>
+                                {{ review.start_time|default:"-" }}
+                            </td>
+                            
+                            <!-- Intern Name -->
+                            <td>
+                                <div class="fw-medium">{{ review.intern_name }}</div>
+                            </td>
+                            
+                            <!-- Week/Lesson -->
+                            <td>
+                                <span class="badge bg-secondary text-bg-secondary">
+                                    {{ review.lesson_name }}
+                                </span>
+                            </td>
+                            
+                            <!-- Preferred Reviewer -->
+                            <td>
+                                {% if review.preferred_reviewer %}
+                                <div class="text-truncate" style="max-width: 120px;">
+                                    {{ review.preferred_reviewer.name }}
+                                </div>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            
+                            <!-- Assigned Reviewer -->
+                            <td>
+                                {% if review.assigned_reviewer %}
+                                <div class="text-truncate" style="max-width: 120px;">
+                                    {{ review.assigned_reviewer.name }}
+                                </div>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            
+                            <!-- Meet Link -->
+                            <td>
+                                {% if review.google_meet_link %}
+                                <a href="{{ review.google_meet_link }}" 
+                                   target="_blank" 
+                                   class="btn btn-sm btn-outline-primary" 
+                                   title="Join meeting">
+                                    <i class="bi bi-camera-video me-1"></i>
+                                    Join
+                                </a>
+                                {% else %}
+                                <span class="badge bg-secondary text-bg-secondary">Pending</span>
+                                {% endif %}
+                            </td>
+                            
+                            <!-- Status -->
+                            <td class="pe-3">
+                                {% if review.status == 'scheduled' %}
+                                <span class="badge bg-success rounded-pill">
+                                    <i class="bi bi-calendar-check me-1"></i>
+                                    {{ review.get_status_display }}
+                                </span>
+                                {% elif review.status == 'pending' %}
+                                <span class="badge bg-warning rounded-pill">
+                                    <i class="bi bi-clock me-1"></i>
+                                    {{ review.get_status_display }}
+                                </span>
+                                {% elif review.status == 'completed' %}
+                                <span class="badge bg-info rounded-pill">
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    {{ review.get_status_display }}
+                                </span>
+                                {% else %}
+                                <span class="badge bg-secondary rounded-pill">
+                                    {{ review.get_status_display }}
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <div class="py-4">
+                                    <i class="bi bi-inbox display-6 text-muted mb-3"></i>
+                                    <h5>No reviews found</h5>
+                                    <p class="text-muted mb-0">
+                                        {% if date_filter %}
+                                        Try changing your filter criteria
+                                        {% else %}
+                                        Create your first review request above
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Mobile-friendly list view -->
+            <div class="d-md-none">
+                {% for review in reviews %}
+                <div class="border-bottom p-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h6 class="mb-1 fw-semibold">{{ review.intern_name }}</h6>
+                            <div class="small text-muted">
+                                {{ review.date }} • {{ review.start_time|default:"Time TBD" }}
+                            </div>
+                        </div>
+                        <div>
+                            {% if review.status == 'scheduled' %}
+                            <span class="badge bg-success">Scheduled</span>
+                            {% elif review.status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                            {% elif review.status == 'completed' %}
+                            <span class="badge bg-info">Completed</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ review.status }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <small class="text-muted d-block mb-1">Week</small>
+                            <span class="badge bg-secondary d-inline-block">{{ review.lesson_name }}</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block mb-1">Reviewer</small>
+                            <div class="fw-medium">{{ review.assigned_reviewer.name|default:"-" }}</div>
+                        </div>
+                    </div>
+                    
+                    {% if review.google_meet_link %}
+                    <div class="d-grid">
+                        <a href="{{ review.google_meet_link }}" 
+                           target="_blank" 
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-camera-video me-1"></i>Join Meeting
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox display-6 text-muted mb-3"></i>
+                    <h5>No reviews found</h5>
+                    <p class="text-muted mb-0">
+                        {% if date_filter %}
+                        Try changing your filter criteria
+                        {% else %}
+                        Create your first review request above
+                        {% endif %}
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Table Footer -->
+        {% if reviews %}
+        <div class="card-footer">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <small class="text-muted">
+                        Showing {{ reviews|length }} review{{ reviews|length|pluralize }}
+                    </small>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <small class="text-muted">
+                        Last updated: {% now "F j, Y g:i A" %}
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 </div>
+
+<!-- Custom CSS for better alignment and responsiveness -->
+<style>
+/* Form field spacing */
+.form-control, .form-select, textarea {
+    margin-bottom: 0.25rem;
+}
+
+/* Better table alignment */
+.table td, .table th {
+    vertical-align: middle;
+}
+
+/* Responsive table adjustments */
+@media (max-width: 767.98px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .form-label {
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .form-control, .form-select {
+        font-size: 0.875rem;
+        padding: 0.375rem 0.75rem;
+    }
+    
+    .btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Medium devices (tablets) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .table th, .table td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+/* Ensure badges work with dark theme */
+.badge.bg-secondary {
+    opacity: 0.9;
+}
+
+/* Improve form layout on small screens */
+@media (max-width: 575.98px) {
+    .row.g-3 {
+        --bs-gutter-y: 1rem;
+    }
+    
+    .form-control, .form-select {
+        min-height: calc(1.5em + 1rem + 2px);
+    }
+}
+
+/* Better alignment for table cells with badges */
+.table td .badge {
+    white-space: nowrap;
+    display: inline-block;
+}
+
+/* Improve button alignment in table */
+.table .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* Responsive text truncation */
+.text-truncate {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Mobile view improvements */
+.d-md-none .border-bottom {
+    border-color: rgba(var(--bs-border-color-rgb), 0.5) !important;
+}
+
+.d-md-none .btn {
+    width: 100%;
+}
+</style>
+
 {% endblock %}

@@ -2,35 +2,40 @@
 
 {% block content %}
 <div class="row mb-4">
-    <div class="col-md-12">
-        <h2>Coordinator Dashboard</h2>
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0 text-dark">Coordinator Dashboard</h2>
+            <div class="d-flex gap-2">
+                <button class="btn btn-success btn-sm" onclick="copyToAdvisor()">Copy for Advisor</button>
+                <button class="btn btn-info btn-sm" onclick="copyToReviewer()">Copy for Reviewer</button>
+            </div>
+        </div>
         
         <!-- Filters -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>Filters</h5>
+        <div class="card mb-4 border-dark">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Filters</h5>
             </div>
             <div class="card-body">
                 <form method="get" class="row g-3">
-                    <div class="col-md-3">
-                        <label>Date</label>
-                        <input type="date" name="date" class="form-control" value="{{ date_filter }}">
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <label class="form-label text-dark fw-bold">Date</label>
+                        <input type="date" name="date" class="form-control form-control-sm border-dark" value="{{ date_filter }}">
                     </div>
-                    <div class="col-md-3">
-                        <label>Advisor</label>
-                        <select name="advisor" class="form-control">
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <label class="form-label text-dark fw-bold">Advisor</label>
+                        <select name="advisor" class="form-control form-control-sm border-dark">
                             <option value="">All Advisors</option>
                             {% for advisor in advisors %}
                             <option value="{{ advisor.id }}" {% if advisor_filter == advisor.id|stringformat:"i" %}selected{% endif %}>
-                                <!--  advisor.user.first_name -- advisor.user.last_name  -->
-                                  {{advisor.user.username}}
+                                {{advisor.user.username}}
                             </option>
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label>Reviewer</label>
-                        <select name="reviewer" class="form-control">
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <label class="form-label text-dark fw-bold">Reviewer</label>
+                        <select name="reviewer" class="form-control form-control-sm border-dark">
                             <option value="">All Reviewers</option>
                             {% for reviewer in reviewers %}
                             <option value="{{ reviewer.id }}" {% if reviewer_filter == reviewer.id|stringformat:"i" %}selected{% endif %}>
@@ -39,9 +44,9 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label>Status</label>
-                        <select name="status" class="form-control">
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <label class="form-label text-dark fw-bold">Status</label>
+                        <select name="status" class="form-control form-control-sm border-dark">
                             <option value="">All Status</option>
                             <option value="pending" {% if status_filter == "pending" %}selected{% endif %}>Pending</option>
                             <option value="scheduled" {% if status_filter == "scheduled" %}selected{% endif %}>Scheduled</option>
@@ -50,87 +55,96 @@
                         </select>
                     </div>
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Filter</button>
-                        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Clear</a>
+                        <button type="submit" class="btn btn-primary btn-sm">Apply Filters</button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-sm">Clear Filters</a>
                     </div>
                 </form>
-                
             </div>
-        </div>
-        
-        <!-- Copy Buttons -->
-        <div class="mb-3">
-            <button class="btn btn-success" onclick="copyToAdvisor()">Copy for Advisor</button>
-            <button class="btn btn-info" onclick="copyToReviewer()">Copy for Reviewer</button>
         </div>
         
         <!-- Reviews Table -->
-        <div class="card">
-            <div class="card-header">
-                <h5>Reviews</h5>
+        <div class="card border-dark">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Reviews</h5>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="selectAll">
+                    <label class="form-check-label small" for="selectAll">Select All</label>
+                </div>
             </div>
-            <div class="card-body">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th><input type="checkbox" id="selectAll"></th>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Intern</th>
-                            <th>Lesson</th>
-                            <th>Advisor</th>
-                            <th>Preferred Reviewer</th>
-                            <th>Assigned Reviewer</th>
-                            <th>Remarks</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for review in reviews %}
-                        <tr>
-                            <td><input type="checkbox" class="review-check" value="{{ review.id }}"></td>
-                            <td>{{ review.date }}</td>
-                            <td>{{ review.start_time|default:"-" }}</td>
-                            <td>{{ review.intern_name }}</td>
-                            <td>{{ review.lesson_name }}</td>
-                            <td>{{ review.created_by.first_name }} {{ review.created_by.last_name }}</td>
-                            <td>{{ review.preferred_reviewer.name|default:"-" }}</td>
-                            <td>{{ review.assigned_reviewer.name|default:"-" }}</td>
-                            {% if review.remarks != None %}
-                            <td><a class="nav-link" href="{% url 'remarks' review.id %}">Yes</a></td>
-                            {% else %}
-                            <td>No</td>
-                            {% endif %}
-                            <td>
-                                <span class="badge bg-{% if review.status == 'scheduled' %}success{% elif review.status == 'pending' %}warning{% elif review.status == 'completed' %}info{% else %}secondary{% endif %}">
-                                    {{ review.get_status_display }}
-                                </span>
-                            </td>
-                            <td>
-                                <a href="{% url 'update_review' review.id %}" class="btn btn-sm btn-primary">Edit</a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="10" class="text-center">No reviews found</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="width: 40px;" class="text-white"></th>
+                                <th class="text-white">Date</th>
+                                <th class="text-white">Time</th>
+                                <th class="text-white">Intern</th>
+                                <th class="text-white">Lesson</th>
+                                <th class="text-white">Advisor</th>
+                                <th class="text-white">Preferred Reviewer</th>
+                                <th class="text-white">Assigned Reviewer</th>
+                                <th class="text-white">Remarks</th>
+                                <th class="text-white">Status</th>
+                                <th style="width: 80px;" class="text-white">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for review in reviews %}
+                            <tr class="border-dark">
+                                <td>
+                                    <input type="checkbox" class="review-check form-check-input" value="{{ review.id }}">
+                                </td>
+                                <td class="fw-bold text-dark">{{ review.date }}</td>
+                                <td class="fw-bold text-dark">{{ review.start_time|default:"-" }}</td>
+                                <td class="fw-bold text-dark">{{ review.intern_name }}</td>
+                                <td class="fw-bold text-dark">{{ review.lesson_name }}</td>
+                                <td class="fw-bold text-dark">{{ review.created_by.first_name }} {{ review.created_by.last_name }}</td>
+                                <td class="fw-bold text-dark">{{ review.preferred_reviewer.name|default:"-" }}</td>
+                                <td class="fw-bold text-dark">{{ review.assigned_reviewer.name|default:"-" }}</td>
+                                {% if review.remarks != None %}
+                                <td><a class="btn btn-link btn-sm p-0 fw-bold" href="{% url 'remarks' review.id %}">Yes</a></td>
+                                {% else %}
+                                <td class="fw-bold text-dark">No</td>
+                                {% endif %}
+                                <td>
+                                    <span class="badge bg-{% if review.status == 'scheduled' %}success{% elif review.status == 'pending' %}warning{% elif review.status == 'completed' %}info{% else %}secondary{% endif %} fw-bold">
+                                        {{ review.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'update_review' review.id %}" class="btn btn-sm btn-outline-dark fw-bold">Edit</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="11" class="text-center py-4">
+                                    <div class="py-3">
+                                        <i class="bi bi-calendar-x text-dark" style="font-size: 2rem;"></i>
+                                        <p class="mt-2 mb-0 fw-bold text-dark">No reviews found</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         
         <!-- Output Area -->
         <div id="outputArea" class="mt-4" style="display: none;">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Notification Text</h5>
+            <div class="card border-dark">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Notification Text</h5>
+                    <button onclick="hideOutput()" class="btn-close btn-close-white"></button>
                 </div>
                 <div class="card-body">
-                    <textarea id="notificationText" class="form-control" rows="10"></textarea>
-                    <button onclick="copyOutput()" class="btn btn-primary mt-2">Copy to Clipboard</button>
-                    <button onclick="hideOutput()" class="btn btn-secondary mt-2">Close</button>
+                    <textarea id="notificationText" class="form-control border-dark" rows="8" style="font-family: monospace;"></textarea>
+                    <div class="d-flex gap-2 mt-3">
+                        <button onclick="copyOutput()" class="btn btn-dark">Copy to Clipboard</button>
+                        <button onclick="hideOutput()" class="btn btn-outline-dark">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -163,7 +177,7 @@ function copyToAdvisor() {
         .then(data => {
             document.getElementById('notificationText').value = data.text;
             document.getElementById('outputArea').style.display = 'block';
-            window.scrollTo(0, document.body.scrollHeight);
+            document.getElementById('outputArea').scrollIntoView({ behavior: 'smooth' });
         });
 }
 
@@ -180,7 +194,7 @@ function copyToReviewer() {
         .then(data => {
             document.getElementById('notificationText').value = data.text;
             document.getElementById('outputArea').style.display = 'block';
-            window.scrollTo(0, document.body.scrollHeight);
+            document.getElementById('outputArea').scrollIntoView({ behavior: 'smooth' });
         });
 }
 
@@ -194,5 +208,134 @@ function copyOutput() {
 function hideOutput() {
     document.getElementById('outputArea').style.display = 'none';
 }
+
+// Make table rows clickable to select checkbox
+document.addEventListener('DOMContentLoaded', function() {
+    const tableRows = document.querySelectorAll('tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || 
+                e.target.type === 'checkbox' || e.target.closest('a') || e.target.closest('button')) {
+                return;
+            }
+            
+            const checkbox = this.querySelector('.review-check');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                // Add visual feedback
+                if (checkbox.checked) {
+                    this.classList.add('table-active');
+                } else {
+                    this.classList.remove('table-active');
+                }
+            }
+        });
+    });
+});
 </script>
+
+<style>
+    /* Make all text dark for better visibility */
+    body {
+        color: #212529 !important;
+    }
+    
+    .card {
+        background-color: rgba(255, 255, 255, 0.95);
+        color: #212529;
+    }
+    
+    .table {
+        color: #212529;
+    }
+    
+    .form-label {
+        color: #212529 !important;
+    }
+    
+    .btn {
+        font-weight: 600;
+    }
+    
+    /* Enhanced table styling */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .table th {
+        font-weight: 700;
+        background-color: #343a40;
+    }
+    
+    .table td {
+        font-weight: 600;
+        border-color: #dee2e6;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.075);
+    }
+    
+    /* Selected row with high contrast */
+    .table-active {
+        background-color: rgba(13, 110, 253, 0.2) !important;
+    }
+    
+    /* Badge styling */
+    .badge {
+        font-weight: 700;
+        padding: 0.4em 0.8em;
+    }
+    
+    /* Input field styling */
+    .form-control, .form-select {
+        border-color: #495057;
+        background-color: white;
+        color: #212529;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #212529;
+        box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.25);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .table th, .table td {
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+        }
+        
+        h5 {
+            font-size: 1.1rem;
+        }
+        
+        .btn-sm {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.85rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .d-flex.gap-2 {
+            width: 100%;
+            justify-content: space-between;
+        }
+        
+        .row.g-3 > [class*="col-"] {
+            margin-bottom: 1rem;
+        }
+    }
+</style>
 {% endblock %}
