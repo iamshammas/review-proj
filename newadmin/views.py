@@ -216,13 +216,13 @@ def advisor_list(request):
     # ]
     
     # If you want to pass names with custom counts
-    names = [
-        {"name": "John Smith", "count": 5},
-        {"name": "Emma Johnson", "count": 3},
-    ]
+    # names = [
+    #     {"name": "John Smith", "count": 5},
+    #     {"name": "Emma Johnson", "count": 3},
+    # ]
     list = Advisor.objects.all()
     return render(request, 'newadmin/advisors.html', {
         # 'names': names,
-        'names': names,  # alternative
+        # 'names': names,  # alternative
         'list':list
     })

@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-@uv)r&se3te!bh^=^y5_plq$5_31kx=i0i9z4f9$exw3g&rvk6'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -79,10 +79,24 @@ WSGI_APPLICATION = 'review_system_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'reviews_io5e',
+        'USER': 'reviews_io5e_user',
+        'PASSWORD': '0OzmscTwZuPFKzuJnWwd7x5dBpAHMs9d',
+        'HOST': 'dpg-d4sh2bk9c44c73emeepg-a.virginia-postgres.render.com',   # something like `dpg-xxxxxx.render.com`
+        'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require',   # Render needs SSL
+        },
     }
 }
 
