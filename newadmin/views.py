@@ -4,7 +4,7 @@ from reviews.models import Reviewer
 from django.contrib import messages
 from django.http import HttpResponse
 import re
-from reviews.models import Advisor
+from reviews.models import Advisor,Review
 # Create your views here.
 
 def register(request):
@@ -226,3 +226,10 @@ def advisor_list(request):
         # 'names': names,  # alternative
         'list':list
     })
+
+
+def review_count(request):
+    data = {
+        'list' : Reviewer.objects.all()
+    }
+    return render(request,'reviewers/review_count.html',data)

@@ -152,8 +152,9 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
-                        <span class="nav-item nav-link">Hello, <b>{{ user.first_name|default:user.username }}</b></span>
+                        <span class="nav-item nav-link">Hello, <b>{{ user.first_name|default:user.username|upper }}</b></span>
                         {% if user.is_staff %}
+                            <a class="nav-link" href="https://plum-gram-51d.notion.site/Syllabus-159791098f58809b8216e913522cf3ab?pvs=4">Syllabus</a>
                             <a class="nav-link" href="{% url 'reporting' %}">Reporting</a>
                             <a class="nav-link" href="{% url 'add_reviewer' %}">Add reviewer</a>
                         {% endif %}
