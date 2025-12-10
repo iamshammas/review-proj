@@ -63,7 +63,7 @@
                         <div class="d-grid d-md-block">
                             <button type="submit" class="btn btn-primary px-4">
                                 <i class="bi bi-send me-2"></i>Submit Review Request
-                            </button>
+                            </button>   
                         </div>
                     </div>
                 </div>
@@ -148,9 +148,16 @@
                             </td>
                             
                             <!-- Intern Name -->
-                            <td>
+                             {% if review.status == 'completed' %}
+                             <td>
+                                <div class="fw-medium"><a href="{% url 'feedback' review.id %}" style="text-decoration: none; color: white;">{{ review.intern_name }}</a></div>
+                            </td>
+                             {% else %}
+                             <td>
                                 <div class="fw-medium">{{ review.intern_name }}</div>
                             </td>
+                             {% endif %}
+                            
                             
                             <!-- Week/Lesson -->
                             <td>

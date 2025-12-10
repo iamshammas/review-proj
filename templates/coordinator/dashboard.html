@@ -97,14 +97,20 @@
                                 </td>
                                 <td class="fw-bold text-dark">{{ review.date }}</td>
                                 <td class="fw-bold text-dark">{{ review.start_time|default:"-" }}</td>
+                                {% if review.status == 'completed' %}
+                                <td class="fw-bold text-dark"><a href="{% url 'feedback' review.id %}" style="text-decoration: none; color: rgba(0, 0, 0,0.9);">{{ review.intern_name }}</a></td>
+                                {% else %}
                                 <td class="fw-bold text-dark">{{ review.intern_name }}</td>
+                                {% endif %}
                                 <td class="fw-bold text-dark">{{ review.lesson_name }}</td>
                                 <td class="fw-bold text-dark">{{ review.created_by.first_name }} {{ review.created_by.last_name }}</td>
                                 <td class="fw-bold text-dark">{{ review.preferred_reviewer.name|default:"-" }}</td>
                                 <td class="fw-bold text-dark">{{ review.assigned_reviewer.name|default:"-" }}</td>
-                                {% if review.remarks != None %}
-                                <td><a class="btn btn-link btn-sm p-0 fw-bold" href="{% url 'remarks' review.id %}">Yes</a></td>
+                                {% if review.remarks %}
+                                <!-- <td class="fw-bold text-dark">No</td> -->
+                                <td><a class="btn btn-link btn-sm p-0 fw-bold" href="{% url 'remarks' review.id %}" style="text-decoration: none; color: rgba(0, 0, 0,0.9);">Yes</a></td>
                                 {% else %}
+                                <!-- <td><a class="btn btn-link btn-sm p-0 fw-bold" href="{% url 'remarks' review.id %}" style="text-decoration: none; color: rgba(0, 0, 0,0.9);">Yes</a></td> -->
                                 <td class="fw-bold text-dark">No</td>
                                 {% endif %}
                                 <td>

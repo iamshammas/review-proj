@@ -183,3 +183,11 @@ def remarks(request,review_id):
         'review':review
     }
     return render(request,'coordinator/remarks.html',data)
+
+def feedback(request,review_id):
+    review = get_object_or_404(Review,id=review_id)
+    if request.method == 'POST':
+        review.feedback = request.POST.get('feedback')
+        review.save()
+        return redirect('dashboard')
+    return render(request,'coordinator/feedback.html',{'review':review})
