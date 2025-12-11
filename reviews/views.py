@@ -61,7 +61,7 @@ def coordinator_dashboard(request):
     
     context = {
         'reviews': reviews,
-        'advisors': Advisor.objects.all(),
+        'advisors': User.objects.filter(is_superuser=False),
         'reviewers': Reviewer.objects.all(),
         'date_filter': date_filter,
         'advisor_filter': advisor_filter,

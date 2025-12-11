@@ -28,7 +28,7 @@
                             <option value="">All Advisors</option>
                             {% for advisor in advisors %}
                             <option value="{{ advisor.id }}" {% if advisor_filter == advisor.id|stringformat:"i" %}selected{% endif %}>
-                                {{advisor.user.username}}
+                                {{advisor.username}}
                             </option>
                             {% endfor %}
                         </select>
