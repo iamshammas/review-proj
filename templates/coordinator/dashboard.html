@@ -96,7 +96,7 @@
                                     <input type="checkbox" class="review-check form-check-input" value="{{ review.id }}">
                                 </td>
                                 <td class="fw-bold text-dark">{{ review.date }}</td>
-                                <td class="fw-bold text-dark">{{ review.start_time|default:"-" }}</td>
+                                <td class="fw-bold text-dark">{{ review.start_time|default:today }}</td>
                                 {% if review.status == 'completed' %}
                                 <td class="fw-bold text-dark"><a href="{% url 'feedback' review.id %}" style="text-decoration: none; color: rgba(0, 0, 0,0.9);">{{ review.intern_name }}</a></td>
                                 {% else %}

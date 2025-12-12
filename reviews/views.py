@@ -10,6 +10,7 @@ from .models import Review, Advisor, Reviewer
 from django.contrib.auth import logout
 from .forms import AdvisorReviewForm, ReviewUpdateForm
 import datetime
+from django.utils.timezone import now
 
 def register(request):
     if request.method == 'POST':
@@ -67,6 +68,7 @@ def coordinator_dashboard(request):
         'advisor_filter': advisor_filter,
         'reviewer_filter': reviewer_filter,
         'status_filter': status_filter,
+        'today': now().date()
     }
     return render(request, 'coordinator/dashboard.html', context)
 
