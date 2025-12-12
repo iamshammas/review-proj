@@ -20,7 +20,7 @@
                 <form method="get" class="row g-3">
                     <div class="col-12 col-md-6 col-lg-3">
                         <label class="form-label text-dark fw-bold">Date</label>
-                        <input type="date" name="date" class="form-control form-control-sm border-dark" value="{{ date_filter }}">
+                        <input type="date" name="date" class="form-control form-control-sm border-dark" value="{{ today }}">
                     </div>
                     <div class="col-12 col-md-6 col-lg-3">
                         <label class="form-label text-dark fw-bold">Advisor</label>
@@ -96,7 +96,7 @@
                                     <input type="checkbox" class="review-check form-check-input" value="{{ review.id }}">
                                 </td>
                                 <td class="fw-bold text-dark">{{ review.date }}</td>
-                                <td class="fw-bold text-dark">{{ review.start_time|default:today }}</td>
+                                <td class="fw-bold text-dark">{{ review.start_time|default:'-' }}</td>
                                 {% if review.status == 'completed' %}
                                 <td class="fw-bold text-dark"><a href="{% url 'feedback' review.id %}" style="text-decoration: none; color: rgba(0, 0, 0,0.9);">{{ review.intern_name }}</a></td>
                                 {% else %}

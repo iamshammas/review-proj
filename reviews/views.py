@@ -9,7 +9,8 @@ from django.contrib.auth.models import User
 from .models import Review, Advisor, Reviewer
 from django.contrib.auth import logout
 from .forms import AdvisorReviewForm, ReviewUpdateForm
-import datetime
+# import datetime
+from datetime import date
 from django.utils.timezone import now
 
 def register(request):
@@ -42,7 +43,8 @@ def dashboard(request):
 @staff_member_required
 def coordinator_dashboard(request):
     # Get filter parameters
-    date_filter = request.GET.get('date', '')
+    today = date.today().strftime('%Y-%m-%d')
+    date_filter = request.GET.get('date', today)
     advisor_filter = request.GET.get('advisor', '')
     reviewer_filter = request.GET.get('reviewer', '')
     status_filter = request.GET.get('status', '')
@@ -65,10 +67,10 @@ def coordinator_dashboard(request):
         'advisors': User.objects.filter(is_superuser=False),
         'reviewers': Reviewer.objects.all(),
         'date_filter': date_filter,
+        'today': today,
         'advisor_filter': advisor_filter,
         'reviewer_filter': reviewer_filter,
         'status_filter': status_filter,
-        'today': now().date()
     }
     return render(request, 'coordinator/dashboard.html', context)
 
