@@ -150,11 +150,11 @@
                             <!-- Intern Name -->
                              {% if review.status == 'completed' %}
                              <td>
-                                <div class="fw-medium"><a href="{% url 'feedback' review.id %}" style="text-decoration: none; color: white;">{{ review.intern_name }}</a></div>
+                                <div class="fw-medium"><a href="{% url 'feedback' review.id %}" style="text-decoration: none; color: white;" title="{{ review.feedback }}">{{ review.intern_name }}</a></div>
                             </td>
                              {% else %}
                              <td>
-                                <div class="fw-medium">{{ review.intern_name }}</div>
+                                <div class="fw-medium" title="{{ review.feedback }}">{{ review.intern_name }}</div>
                             </td>
                              {% endif %}
                             
